@@ -184,11 +184,11 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium mb-1 opacity-80">Guest Name</label>
-            <input v-model="newGuestName" type="text" placeholder="Enter full name" :class="[
+            <input ref="nameInput" v-model="newGuestName" type="text" placeholder="Enter full name" :class="[
               'w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2',
               isDarkMode
-                ? 'bg-gray-800 border-gray-700 focus:ring-blur-500'
-                : 'bg-white border-gray-200 focus:ring-blur-400'
+                ? 'bg-gray-800 border-gray-700 focus:ring-blue-500'
+                : 'bg-white border-gray-200 focus:ring-blue-400'
             ]" @keypress.enter="addGuest" :disabled="addingGuest">
           </div>
 
@@ -285,10 +285,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import { api } from '@/api/api';
 
-// Reactive data
+// Refs
+const nameInput = ref(null);
+const emptyStateButton = ref(null);
 const guests = ref([])
 const newGuestName = ref('')
 const isDarkMode = ref(false)
@@ -305,6 +307,16 @@ const addingGuest = ref(false)
 const addError = ref(null)
 const deletingGuest = ref(false)
 const deleteError = ref(null)
+
+// Watch for modal open to focus input
+watch(showAddModal, (newVal) => {
+  if (newVal) {
+    nextTick(() => {
+      nameInput.value?.focus();
+      newGuestName.value = ''; // Clear previous input
+    });
+  }
+});
 
 // Computed
 const filteredGuests = computed(() => {
