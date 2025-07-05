@@ -245,7 +245,7 @@
           <div class="text-5xl mb-3">❓</div>
           <h2 class="text-xl font-bold mb-1">Delete Guest?</h2>
           <p class="opacity-70">Are you sure you want to remove <span class="font-medium">{{ guestToDelete.name
-          }}</span> from your guest list?</p>
+              }}</span> from your guest list?</p>
         </div>
 
         <div v-if="deleteError" :class="[
@@ -288,9 +288,7 @@
 
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue'
-
-// API base URL
-const API_URL = import.meta.env.VITE_ROTH_API_URL
+import { api } from '@/api/api';
 
 // Reactive data
 const guests = ref([])
@@ -300,6 +298,7 @@ const showAddModal = ref(false)
 const guestToDelete = ref(null)
 const showScrollToTop = ref(false)
 const scrollContainer = ref(null)
+const searchQuery = ref('')
 
 // Loading states
 const loading = ref(true)
@@ -309,19 +308,15 @@ const addError = ref(null)
 const deletingGuest = ref(false)
 const deleteError = ref(null)
 
-// Add this with your other refs
-const searchQuery = ref('')
-
-// Add this in your script setup
+// Computed
 const filteredGuests = computed(() => {
-  if (!searchQuery.value) {
-    return guests.value
-  }
-  const query = searchQuery.value.toLowerCase()
+  if (!searchQuery.value) return guests.value;
+  const query = searchQuery.value.toLowerCase();
   return guests.value.filter(guest =>
     guest.name.toLowerCase().includes(query)
-  )
-})
+  );
+});
+
 
 // Methods
 const scrollToBottom = () => {
@@ -355,81 +350,48 @@ const fetchGuests = async () => {
   try {
     loading.value = true
     error.value = null
-    const response = await fetch(API_URL)
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch guests')
-    }
-
-    const data = await response.json()
-    guests.value = data.data
+    const data = await api.fetchGuests('roth')
+    guests.value = data.data || data
   } catch (err) {
-    error.value = err.message || 'An error occurred while loading guests'
+    error.value = err.message || 'Failed to load guests'
   } finally {
     loading.value = false
   }
 }
 
-// Add new guest via API
+// Add new guest
 const addGuest = async () => {
   if (!newGuestName.value.trim()) return
 
   try {
     addingGuest.value = true
     addError.value = null
-
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        name: newGuestName.value.trim()
-      })
+    const response = await api.addGuest('roth', {
+      name: newGuestName.value.trim()
     })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Failed to add guest')
-    }
-
-    const data = await response.json()
-    guests.value.push(data.data)
+    guests.value.push(response.data || response)
     newGuestName.value = ''
     showAddModal.value = false
     scrollToBottom()
   } catch (err) {
-    addError.value = err.message || 'An error occurred while adding guest'
+    addError.value = err.message || 'Failed to add guest'
   } finally {
     addingGuest.value = false
   }
 }
 
-// Delete guest via API
+// Delete guest
 const confirmDelete = async () => {
   if (!guestToDelete.value) return
 
   try {
     deletingGuest.value = true
     deleteError.value = null
-
-    const response = await fetch(`${API_URL}/${guestToDelete.value.id}`, {
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/json'
-      }
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Failed to delete guest')
-    }
-
+    await api.deleteGuest('roth', guestToDelete.value.id)
     guests.value = guests.value.filter(g => g.id !== guestToDelete.value.id)
     guestToDelete.value = null
   } catch (err) {
-    deleteError.value = err.message || 'An error occurred while deleting guest'
+    deleteError.value = err.message || 'Failed to delete guest'
   } finally {
     deletingGuest.value = false
   }
@@ -447,9 +409,7 @@ const toggleDarkMode = () => {
 // Load preferences and initial data
 onMounted(() => {
   const savedMode = localStorage.getItem('darkMode')
-  if (savedMode !== null) {
-    isDarkMode.value = savedMode === 'true'
-  }
+  if (savedMode !== null) isDarkMode.value = savedMode === 'true'
   fetchGuests()
 })
 </script>
