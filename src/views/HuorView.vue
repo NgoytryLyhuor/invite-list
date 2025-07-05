@@ -20,7 +20,7 @@
 
     <!-- Floating action buttons -->
     <button @click="showAddModal = true" :class="[
-      'fixed bottom-6 right-6 z-20 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110',
+      'fixed bottom-[200px] right-6 z-20 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110',
       isDarkMode ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 border-2 border-blue-200'
     ]" aria-label="Add new guest">
       <span class="text-2xl">+</span>
@@ -243,7 +243,7 @@
           <div class="text-5xl mb-3">❓</div>
           <h2 class="text-xl font-bold mb-1">Delete Guest?</h2>
           <p class="opacity-70">Are you sure you want to remove <span class="font-medium">{{ guestToDelete.name
-          }}</span> from your guest list?</p>
+              }}</span> from your guest list?</p>
         </div>
 
         <div v-if="deleteError" :class="[
