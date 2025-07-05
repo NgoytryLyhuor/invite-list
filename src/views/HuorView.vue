@@ -1,13 +1,13 @@
 <template>
   <div :class="[
     'min-h-screen transition-colors duration-300',
-    isDarkMode ? 'bg-gray-950 text-gray-100' : 'bg-gradient-to-br from-rose-50 to-indigo-50 text-gray-900'
+    isDarkMode ? 'bg-gray-950 text-gray-100' : 'bg-gradient-to-br from-blue-50 to-indigo-50 text-gray-900'
   ]">
     <!-- Floating bubbles background -->
     <div class="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
       <div v-for="i in 15" :key="i" :class="[
         'absolute rounded-full opacity-5 animate-float',
-        isDarkMode ? 'bg-pink-500' : 'bg-indigo-300'
+        isDarkMode ? 'bg-blue-500' : 'bg-indigo-300'
       ]" :style="{
         width: `${Math.random() * 20 + 10}px`,
         height: `${Math.random() * 20 + 10}px`,
@@ -21,7 +21,7 @@
     <!-- Floating action buttons -->
     <button @click="showAddModal = true" :class="[
       'fixed bottom-6 right-6 z-20 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110',
-      isDarkMode ? 'bg-pink-600 text-white' : 'bg-white text-pink-600 border-2 border-pink-200'
+      isDarkMode ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 border-2 border-blue-200'
     ]" aria-label="Add new guest">
       <span class="text-2xl">+</span>
     </button>
@@ -41,7 +41,7 @@
       @scroll="handleScroll">
       <!-- App header -->
       <header class="mb-8 relative">
-        <div class="absolute -top-6 -left-4 w-24 h-24 rounded-full blur-xl opacity-20 bg-pink-400"></div>
+        <div class="absolute -top-6 -left-4 w-24 h-24 rounded-full blur-xl opacity-20 bg-blue-400"></div>
         <div class="relative z-10 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div :class="[
@@ -51,7 +51,7 @@
               💒
             </div>
             <div>
-              <h1 class="text-2xl font-bold">Guest List</h1>
+              <h1 class="text-2xl font-bold"><b>Huor</b> - Guest List</h1>
               <p class="text-sm opacity-70">25-01-2026</p>
             </div>
           </div>
@@ -70,12 +70,14 @@
         isDarkMode ? 'bg-gray-800' : 'bg-white shadow-sm'
       ]">
         <div class="relative flex items-center justify-between">
-          <span class="text-3xl font-bold text-pink-500">
+          <span class="text-3xl font-bold text-blue-500">
             {{ filteredGuests.length }}<span v-if="searchQuery" class="text-sm opacity-70">/{{ guests.length }}</span>
           </span>
           <span class="pl-2">Guest{{ filteredGuests.length !== 1 ? 's' : '' }}</span>
         </div>
-        <div class="text-4xl">👰‍♀️</div>
+        <router-link to="/" class="text-4xl">
+          🤵‍♂️
+        </router-link>
       </div>
 
       <div :class="[
@@ -96,7 +98,7 @@
 
       <!-- Loading state -->
       <div v-if="loading" class="text-center py-8">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mx-auto"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
         <p class="mt-2">Loading guests...</p>
       </div>
 
@@ -149,12 +151,12 @@
           'rounded-lg p-8 text-center',
           isDarkMode ? 'bg-gray-800' : 'bg-white shadow-sm'
         ]">
-          <div class="text-5xl mb-4">💌</div>
+          <div class="text-5xl mb-4">📋</div>
           <h3 class="text-lg font-medium mb-1">No guests yet</h3>
           <p class="text-sm opacity-70 mb-4">Your guest list is waiting to be filled</p>
           <button @click="showAddModal = true" :class="[
             'px-6 py-2 rounded-lg font-medium transition-all',
-            isDarkMode ? 'bg-pink-600 text-white' : 'bg-pink-100 text-pink-600'
+            isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-600'
           ]">
             Add First Guest
           </button>
@@ -209,8 +211,8 @@
               'flex-1 py-3 rounded-xl font-medium transition-all',
               newGuestName.trim()
                 ? (addingGuest
-                  ? (isDarkMode ? 'bg-pink-800 text-gray-400' : 'bg-pink-300 text-white')
-                  : 'bg-pink-600 text-white hover:bg-pink-700')
+                  ? (isDarkMode ? 'bg-blue-800 text-gray-400' : 'bg-blue-300 text-white')
+                  : 'bg-blue-600 text-white hover:bg-blue-700')
                 : (isDarkMode ? 'bg-gray-800 text-gray-500' : 'bg-gray-100 text-gray-400')
             ]">
               <span v-if="!addingGuest">Add Guest</span>
@@ -241,7 +243,7 @@
           <div class="text-5xl mb-3">❓</div>
           <h2 class="text-xl font-bold mb-1">Delete Guest?</h2>
           <p class="opacity-70">Are you sure you want to remove <span class="font-medium">{{ guestToDelete.name
-          }}</span> from your guest list?</p>
+              }}</span> from your guest list?</p>
         </div>
 
         <div v-if="deleteError" :class="[
@@ -286,7 +288,7 @@
 import { ref, onMounted, nextTick, computed } from 'vue'
 
 // API base URL
-const API_URL = 'http://127.0.0.1:8000/api/roth-guests'
+const API_URL = import.meta.env.VITE_HUOR_API_URL
 
 // Reactive data
 const guests = ref([])
@@ -506,12 +508,14 @@ input:focus {
 }
 
 /* Custom scrollbar */
-.max-h-screen::-webkit-scrollbar {
-  width: 6px;
+/* Custom scrollbar */
+.max-h-screen::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.5);
+  border-radius: 3px;
 }
 
-.max-h-screen::-webkit-scrollbar-track {
-  background: transparent;
+.max-h-screen::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.7);
 }
 
 .max-h-screen::-webkit-scrollbar-thumb {
