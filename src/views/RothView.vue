@@ -171,7 +171,7 @@
       class="fixed inset-0 z-30 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       @click.self="showAddModal = false">
       <div :class="[
-        'w-full max-w-md rounded-lg p-6 mb-[100px]',
+        'w-full max-w-md rounded-lg p-6 mb-[170px]',
         isDarkMode ? 'bg-gray-900' : 'bg-white'
       ]">
         <div class="flex justify-between items-center mb-4">

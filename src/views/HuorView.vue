@@ -169,7 +169,7 @@
       class="fixed inset-0 z-30 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       @click.self="showAddModal = false">
       <div :class="[
-        'w-full max-w-md rounded-lg p-6',
+        'w-full max-w-md rounded-lg p-6 mb-[170px]',
         isDarkMode ? 'bg-gray-900' : 'bg-white'
       ]">
         <div class="flex justify-between items-center mb-4">
@@ -243,7 +243,7 @@
           <div class="text-5xl mb-3">❓</div>
           <h2 class="text-xl font-bold mb-1">Delete Guest?</h2>
           <p class="opacity-70">Are you sure you want to remove <span class="font-medium">{{ guestToDelete.name
-              }}</span> from your guest list?</p>
+          }}</span> from your guest list?</p>
         </div>
 
         <div v-if="deleteError" :class="[
@@ -290,7 +290,6 @@ import { api } from '@/api/api';
 
 // Refs
 const nameInput = ref(null);
-const emptyStateButton = ref(null);
 const guests = ref([])
 const newGuestName = ref('')
 const isDarkMode = ref(false)
@@ -327,7 +326,6 @@ const filteredGuests = computed(() => {
   );
 });
 
-
 // Methods
 const scrollToBottom = () => {
   nextTick(() => {
@@ -355,73 +353,78 @@ const handleScroll = () => {
   }
 }
 
-// Fetch guests from API
+// Fetch guests from API - Updated with better error handling
 const fetchGuests = async () => {
   try {
-    loading.value = true
-    error.value = null
-    const data = await api.fetchGuests('huor')
-    guests.value = data.data || data
+    loading.value = true;
+    error.value = null;
+    const data = await api.fetchGuests('huor');
+    guests.value = data.data || data;
   } catch (err) {
-    error.value = err.message || 'Failed to load guests'
+    error.value = err.message || 'Failed to load guests';
+    console.error('Fetch guests error:', err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
-// Add new guest
+// Add new guest - Updated with UTF-8 support
 const addGuest = async () => {
-  if (!newGuestName.value.trim()) return
+  if (!newGuestName.value.trim()) return;
 
   try {
-    addingGuest.value = true
-    addError.value = null
-    const response = await api.addGuest('huor', {
-      name: newGuestName.value.trim()
-    })
-    guests.value.push(response.data || response)
-    newGuestName.value = ''
-    showAddModal.value = false
-    scrollToBottom()
+    addingGuest.value = true;
+    addError.value = null;
+
+    // Ensure proper handling of Khmer characters
+    const guestName = newGuestName.value.trim();
+    const response = await api.addGuest('huor', { name: guestName });
+
+    guests.value.push(response.data || response);
+    newGuestName.value = '';
+    showAddModal.value = false;
+    scrollToBottom();
   } catch (err) {
-    addError.value = err.message || 'Failed to add guest'
+    addError.value = err.message || 'Failed to add guest';
+    console.error('Add guest error:', err);
   } finally {
-    addingGuest.value = false
+    addingGuest.value = false;
   }
 }
 
-// Delete guest
+// Delete guest - Updated with better error handling
 const confirmDelete = async () => {
-  if (!guestToDelete.value) return
+  if (!guestToDelete.value) return;
 
   try {
-    deletingGuest.value = true
-    deleteError.value = null
-    await api.deleteGuest('huor', guestToDelete.value.id)
-    guests.value = guests.value.filter(g => g.id !== guestToDelete.value.id)
-    guestToDelete.value = null
+    deletingGuest.value = true;
+    deleteError.value = null;
+    await api.deleteGuest('huor', guestToDelete.value.id);
+    guests.value = guests.value.filter(g => g.id !== guestToDelete.value.id);
+    guestToDelete.value = null;
   } catch (err) {
-    deleteError.value = err.message || 'Failed to delete guest'
+    deleteError.value = err.message || 'Failed to delete guest';
+    console.error('Delete guest error:', err);
   } finally {
-    deletingGuest.value = false
+    deletingGuest.value = false;
   }
 }
 
 const prepareDelete = (guest) => {
-  guestToDelete.value = guest
+  guestToDelete.value = guest;
 }
 
 const toggleDarkMode = () => {
-  isDarkMode.value = !isDarkMode.value
-  localStorage.setItem('darkMode', isDarkMode.value)
+  isDarkMode.value = !isDarkMode.value;
+  localStorage.setItem('darkMode', isDarkMode.value);
 }
 
 // Load preferences and initial data
 onMounted(() => {
-  const savedMode = localStorage.getItem('darkMode')
-  if (savedMode !== null) isDarkMode.value = savedMode === 'true'
-  fetchGuests()
-})
+  const savedMode = localStorage.getItem('darkMode');
+  if (savedMode !== null) isDarkMode.value = savedMode === 'true';
+  fetchGuests();
+});
 </script>
 
 <style>

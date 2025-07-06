@@ -18,10 +18,14 @@ function getApiBase(weddingType) {
     : API_CONFIG[weddingType].production;
 }
 
-// API Methods
+// API Methods with UTF-8 support
 export const api = {
   async fetchGuests(weddingType) {
-    const response = await fetch(`${getApiBase(weddingType)}`);
+    const response = await fetch(`${getApiBase(weddingType)}`, {
+      headers: {
+        'Accept': 'application/json; charset=utf-8'
+      }
+    });
     if (!response.ok) throw new Error('Failed to fetch guests');
     return await response.json();
   },
@@ -29,22 +33,44 @@ export const api = {
   async addGuest(weddingType, guestData) {
     const response = await fetch(`${getApiBase(weddingType)}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Accept': 'application/json; charset=utf-8'
+      },
       body: JSON.stringify(guestData)
     });
-    if (!response.ok) throw new Error('Failed to add guest');
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to add guest');
+    }
+
     return await response.json();
   },
 
   async deleteGuest(weddingType, guestId) {
     const response = await fetch(`${getApiBase(weddingType)}/${guestId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json; charset=utf-8'
+      }
     });
-    if (!response.ok) throw new Error('Failed to delete guest');
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to delete guest');
+    }
+
     return true;
   }
 };
 
-// Usage example:
-// const guests = await api.fetchGuests('huor');
-// await api.addGuest('roth', { name: 'John Doe' });
+// Enhanced usage example with error handling:
+/*
+try {
+  const guests = await api.fetchGuests('huor');
+  await api.addGuest('huor', { name: 'លោក Apple និង friend' });
+} catch (error) {
+  console.error('API Error:', error.message);
+}
+*/
