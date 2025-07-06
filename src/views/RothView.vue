@@ -171,7 +171,7 @@
       class="fixed inset-0 z-30 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       @click.self="showAddModal = false">
       <div :class="[
-        'w-full max-w-md rounded-lg p-6',
+        'w-full max-w-md rounded-lg p-6 mb-[100px]',
         isDarkMode ? 'bg-gray-900' : 'bg-white'
       ]">
         <div class="flex justify-between items-center mb-4">
@@ -245,7 +245,7 @@
           <div class="text-5xl mb-3">❓</div>
           <h2 class="text-xl font-bold mb-1">Delete Guest?</h2>
           <p class="opacity-70">Are you sure you want to remove <span class="font-medium">{{ guestToDelete.name
-          }}</span> from your guest list?</p>
+              }}</span> from your guest list?</p>
         </div>
 
         <div v-if="deleteError" :class="[
